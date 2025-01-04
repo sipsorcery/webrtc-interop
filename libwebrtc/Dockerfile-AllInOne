@@ -25,6 +25,7 @@ RUN fetch --nohooks webrtc
 WORKDIR /src/webrtc-checkout/src
 RUN git fetch --all
 RUN git checkout remotes/branch-heads/6834 -b m132 # 6834 == m132, see https://chromiumdash.appspot.com/branches.
+ENV DEPOT_TOOLS_WIN_TOOLCHAIN=0
 RUN gclient sync
 RUN build/install-build-deps.sh
 
