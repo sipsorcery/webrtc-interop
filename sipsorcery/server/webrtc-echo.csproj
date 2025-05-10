@@ -8,11 +8,11 @@
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.3" />
-    <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.4" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.1" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageReference Include="EmbedIO" Version="3.5.2" />
-    <PackageReference Include="SIPSorcery" Version="8.0.12" />
+    <PackageReference Include="SIPSorcery" Version="8.0.14" />
   </ItemGroup>
 
   <ItemGroup>
