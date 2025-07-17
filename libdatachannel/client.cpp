@@ -115,7 +115,7 @@ int main(int argc, char **argv) try {
 				auto res = cl.Post(path.c_str(), dumped.c_str(), "application/json");
 				if (!res)
 					throw std::runtime_error("HTTP request to " + url +
-					                         " failed; error code: " + std::to_string(res.error()));
+					                         " failed; error code: " + http::to_string(res.error()));
 
 				if (res->status != 200)
 					throw std::runtime_error("HTTP POST failed with status " +

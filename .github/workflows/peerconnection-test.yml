@@ -24,7 +24,13 @@ jobs:
       - uses: actions/checkout@v2
       - name: Update submodules
         if: matrix.library == 'libdatachannel'
-        run: git submodule update --init --recursive
+        run: |
+          # fetch cpp-httplib locked in .git/index
+          git submodule update --init libdatachannel/deps/cpp-httplib
+          # fetch the newest libdatachannel
+          git submodule update --init --remote libdatachannel/deps/libdatachannel
+          # fetch cpp-httplib and libdatachannel deps (if there are any) locked in their .git/index
+          git submodule foreach --recursive git submodule update --init
       - name: Build ${{ matrix.library }} and push to GitHub container registry.
         run: |
           echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u sipsorcery --password-stdin
