@@ -6,16 +6,7 @@ C++17 WebRTC echo client and server with libdatachannel.
 
 You need cmake and the development libraries with header files for either OpenSSL or GnuTLS. On Debian/Ubuntu, you can install them with either `$ apt install libssl-dev` or `$ apt install libgnutls28-dev`.
 
-Additionally, be sure the submodules are updated with:
-
-```sh
-# fetch cpp-httplib locked in .git/index
-git submodule update --init libdatachannel/deps/cpp-httplib
-# fetch the newest libdatachannel
-git submodule update --init --remote libdatachannel/deps/libdatachannel
-# fetch cpp-httplib and libdatachannel deps (if there are any) locked in their .git/index
-git submodule foreach --recursive git submodule update --init
-```
+Additionally, be sure the submodules are updated with `git submodule update --init --recursive`.
 
 For building on Windows vcpkg can be used to install the required dependencies:
 
