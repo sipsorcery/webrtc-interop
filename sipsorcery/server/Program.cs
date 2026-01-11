@@ -34,235 +34,234 @@ using Serilog.Extensions.Logging;
 using SIPSorcery.Net;
 using SIPSorceryMedia.Abstractions;
 
-namespace webrtc_echo
+namespace webrtc_echo;
+
+public class Options
 {
-    public class Options
+    public const string DEFAULT_WEBSERVER_LISTEN_URL = "http://*:8080/";
+    public const LogEventLevel DEFAULT_VERBOSITY = LogEventLevel.Debug;
+    public const int TEST_TIMEOUT_SECONDS = 10;
+
+    [Option('l', "listen", Required = false, Default = DEFAULT_WEBSERVER_LISTEN_URL,
+        HelpText = "The URL the web server will listen on.")]
+    public string ServerUrl { get; set; }
+
+    [Option("timeout", Required = false, Default = TEST_TIMEOUT_SECONDS,
+        HelpText = "Timeout in seconds to close the peer connection. Set to 0 for no timeout.")]
+    public int TestTimeoutSeconds { get; set; }
+
+    [Option('v', "verbosity", Required = false, Default = DEFAULT_VERBOSITY,
+        HelpText = "The log level verbosity (0=Verbose, 1=Debug, 2=Info, 3=Warn...).")]
+    public LogEventLevel Verbosity { get; set; }
+}
+
+class Program
+{
+    private static Microsoft.Extensions.Logging.ILogger logger = NullLogger.Instance;
+
+    private static List<IPAddress> _icePresets = new List<IPAddress>();
+
+    static void Main(string[] args)
     {
-        public const string DEFAULT_WEBSERVER_LISTEN_URL = "http://*:8080/";
-        public const LogEventLevel DEFAULT_VERBOSITY = LogEventLevel.Debug;
-        public const int TEST_TIMEOUT_SECONDS = 10;
+        // Apply any command line options
+        //if (args.Length > 0)
+        //{
+        //    url = args[0];
+        //    for(int i=1; i<args.Length; i++)
+        //    {
+        //        if(IPAddress.TryParse(args[i], out var addr))
+        //        {
+        //            _icePresets.Add(addr);
+        //            Console.WriteLine($"ICE candidate preset address {addr} added.");
+        //        }
+        //    }
+        //}
 
-        [Option('l', "listen", Required = false, Default = DEFAULT_WEBSERVER_LISTEN_URL,
-            HelpText = "The URL the web server will listen on.")]
-        public string ServerUrl { get; set; }
+        string listenUrl = Options.DEFAULT_WEBSERVER_LISTEN_URL;
+        LogEventLevel verbosity = Options.DEFAULT_VERBOSITY;
+        int pcTimeout = Options.TEST_TIMEOUT_SECONDS;
 
-        [Option("timeout", Required = false, Default = TEST_TIMEOUT_SECONDS,
-            HelpText = "Timeout in seconds to close the peer connection. Set to 0 for no timeout.")]
-        public int TestTimeoutSeconds { get; set; }
+        if (args != null)
+        {
+            Options opts = null;
+            var parseResult = Parser.Default.ParseArguments<Options>(args)
+                .WithParsed(o => opts = o);
 
-        [Option('v', "verbosity", Required = false, Default = DEFAULT_VERBOSITY,
-            HelpText = "The log level verbosity (0=Verbose, 1=Debug, 2=Info, 3=Warn...).")]
-        public LogEventLevel Verbosity { get; set; }
+            listenUrl = opts != null && !string.IsNullOrEmpty(opts.ServerUrl) ? opts.ServerUrl : listenUrl;
+            verbosity = opts != null ? opts.Verbosity : verbosity;
+            pcTimeout = opts != null ? opts.TestTimeoutSeconds : pcTimeout;
+        }
+
+        logger = AddConsoleLogger(verbosity);
+
+        // Start the web server.
+        using (var server = CreateWebServer(listenUrl, pcTimeout))
+        {
+            server.RunAsync();
+
+            Console.WriteLine("ctrl-c to exit.");
+            var mre = new ManualResetEvent(false);
+            Console.CancelKeyPress += (sender, eventArgs) =>
+            {
+                // cancel the cancellation to allow the program to shutdown cleanly
+                eventArgs.Cancel = true;
+                mre.Set();
+            };
+
+            mre.WaitOne();
+        }
     }
 
-    class Program
+    private static WebServer CreateWebServer(string url, int pcTimeout)
     {
-        private static Microsoft.Extensions.Logging.ILogger logger = NullLogger.Instance;
+        var server = new WebServer(o => o
+                .WithUrlPrefix(url)
+                .WithMode(HttpListenerMode.EmbedIO))
+            .WithCors("*", "*", "*")
+            .WithAction("/offer", HttpVerbs.Post, (ctx) => Offer(ctx, pcTimeout))
+            .WithStaticFolder("/", "../../html", false);
+        server.StateChanged += (s, e) => Console.WriteLine($"WebServer New State - {e.NewState}");
 
-        private static List<IPAddress> _icePresets = new List<IPAddress>();
+        return server;
+    }
 
-        static void Main(string[] args)
+    private async static Task Offer(IHttpContext context, int pcTimeout)
+    {
+        var offer = await context.GetRequestDataAsync<RTCSessionDescriptionInit>();
+
+        var jsonOptions = new JsonSerializerOptions();
+        jsonOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+
+        var echoServer = new WebRTCEchoServer(_icePresets);
+        var pc = await echoServer.GotOffer(offer);
+
+        if (pc != null)
         {
-            // Apply any command line options
-            //if (args.Length > 0)
-            //{
-            //    url = args[0];
-            //    for(int i=1; i<args.Length; i++)
-            //    {
-            //        if(IPAddress.TryParse(args[i], out var addr))
-            //        {
-            //            _icePresets.Add(addr);
-            //            Console.WriteLine($"ICE candidate preset address {addr} added.");
-            //        }
-            //    }
-            //}
-
-            string listenUrl = Options.DEFAULT_WEBSERVER_LISTEN_URL;
-            LogEventLevel verbosity = Options.DEFAULT_VERBOSITY;
-            int pcTimeout = Options.TEST_TIMEOUT_SECONDS;
-
-            if (args != null)
+            var answer = new RTCSessionDescriptionInit { type = RTCSdpType.answer, sdp = pc.localDescription.sdp.ToString() };
+            context.Response.ContentType = "application/json";
+            using (var responseStm = context.OpenResponseStream(false, false))
             {
-                Options opts = null;
-                var parseResult = Parser.Default.ParseArguments<Options>(args)
-                    .WithParsed(o => opts = o);
-
-                listenUrl = opts != null && !string.IsNullOrEmpty(opts.ServerUrl) ? opts.ServerUrl : listenUrl;
-                verbosity = opts != null ? opts.Verbosity : verbosity;
-                pcTimeout = opts != null ? opts.TestTimeoutSeconds : pcTimeout;
+                await JsonSerializer.SerializeAsync(responseStm, answer, jsonOptions);
             }
 
-            logger = AddConsoleLogger(verbosity);
-
-            // Start the web server.
-            using (var server = CreateWebServer(listenUrl, pcTimeout))
+            if (pcTimeout != 0)
             {
-                server.RunAsync();
+                logger.LogDebug($"Setting peer connection close timeout to {pcTimeout} seconds.");
 
-                Console.WriteLine("ctrl-c to exit.");
-                var mre = new ManualResetEvent(false);
-                Console.CancelKeyPress += (sender, eventArgs) =>
+                var timeout = new Timer((state) =>
                 {
-                    // cancel the cancellation to allow the program to shutdown cleanly
-                    eventArgs.Cancel = true;
-                    mre.Set();
-                };
-
-                mre.WaitOne();
-            }
-        }
-
-        private static WebServer CreateWebServer(string url, int pcTimeout)
-        {
-            var server = new WebServer(o => o
-                    .WithUrlPrefix(url)
-                    .WithMode(HttpListenerMode.EmbedIO))
-                .WithCors("*", "*", "*")
-                .WithAction("/offer", HttpVerbs.Post, (ctx) => Offer(ctx, pcTimeout))
-                .WithStaticFolder("/", "../../html", false);
-            server.StateChanged += (s, e) => Console.WriteLine($"WebServer New State - {e.NewState}");
-
-            return server;
-        }
-
-        private async static Task Offer(IHttpContext context, int pcTimeout)
-        {
-            var offer = await context.GetRequestDataAsync<RTCSessionDescriptionInit>();
-
-            var jsonOptions = new JsonSerializerOptions();
-            jsonOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
-
-            var echoServer = new WebRTCEchoServer(_icePresets);
-            var pc = await echoServer.GotOffer(offer);
-
-            if (pc != null)
-            {
-                var answer = new RTCSessionDescriptionInit { type = RTCSdpType.answer, sdp = pc.localDescription.sdp.ToString() };
-                context.Response.ContentType = "application/json";
-                using (var responseStm = context.OpenResponseStream(false, false))
-                {
-                    await JsonSerializer.SerializeAsync(responseStm, answer, jsonOptions);
-                }
-
-                if (pcTimeout != 0)
-                {
-                    logger.LogDebug($"Setting peer connection close timeout to {pcTimeout} seconds.");
-
-                    var timeout = new Timer((state) =>
+                    if (!pc.IsClosed)
                     {
-                        if (!pc.IsClosed)
-                        {
-                            logger.LogWarning("Test timed out.");
-                            pc.close();
-                        }
-                    }, null, pcTimeout * 1000, Timeout.Infinite);
-                    pc.OnClosed += timeout.Dispose;
-                }
+                        logger.LogWarning("Test timed out.");
+                        pc.close();
+                    }
+                }, null, pcTimeout * 1000, Timeout.Infinite);
+                pc.OnClosed += timeout.Dispose;
             }
-        }
-
-        private static Microsoft.Extensions.Logging.ILogger AddConsoleLogger(
-            LogEventLevel logLevel = LogEventLevel.Debug)
-        {
-            var serilogLogger = new LoggerConfiguration()
-                .Enrich.FromLogContext()
-                .MinimumLevel.Is(logLevel)
-                .WriteTo.Console()
-                .CreateLogger();
-            var factory = new SerilogLoggerFactory(serilogLogger);
-            SIPSorcery.LogFactory.Set(factory);
-            return factory.CreateLogger<Program>();
         }
     }
 
-    public class WebRTCEchoServer
+    private static Microsoft.Extensions.Logging.ILogger AddConsoleLogger(
+        LogEventLevel logLevel = LogEventLevel.Debug)
     {
-        private const int VP8_PAYLOAD_ID = 96;
+        var serilogLogger = new LoggerConfiguration()
+            .Enrich.FromLogContext()
+            .MinimumLevel.Is(logLevel)
+            .WriteTo.Console()
+            .CreateLogger();
+        var factory = new SerilogLoggerFactory(serilogLogger);
+        SIPSorcery.LogFactory.Set(factory);
+        return factory.CreateLogger<Program>();
+    }
+}
 
-        private static Microsoft.Extensions.Logging.ILogger logger = NullLogger.Instance;
+public class WebRTCEchoServer
+{
+    private const int VP8_PAYLOAD_ID = 96;
 
-        private List<IPAddress> _presetIceAddresses;
+    private static Microsoft.Extensions.Logging.ILogger logger = NullLogger.Instance;
 
-        public WebRTCEchoServer(List<IPAddress> presetAddresses)
+    private List<IPAddress> _presetIceAddresses;
+
+    public WebRTCEchoServer(List<IPAddress> presetAddresses)
+    {
+        logger = SIPSorcery.LogFactory.CreateLogger<WebRTCEchoServer>();
+        _presetIceAddresses = presetAddresses;
+    }
+
+    public async Task<RTCPeerConnection> GotOffer(RTCSessionDescriptionInit offer)
+    {
+        logger.LogDebug($"SDP offer received.");
+        logger.LogDebug(offer.sdp);
+
+        var pc = new RTCPeerConnection();
+
+        if (_presetIceAddresses != null)
         {
-            logger = SIPSorcery.LogFactory.CreateLogger<WebRTCEchoServer>();
-            _presetIceAddresses = presetAddresses;
+            foreach (var addr in _presetIceAddresses)
+            {
+                var rtpPort = pc.GetRtpChannel().RTPPort;
+                var publicIPv4Candidate = new RTCIceCandidate(RTCIceProtocol.udp, addr, (ushort)rtpPort, RTCIceCandidateType.host);
+                pc.addLocalIceCandidate(publicIPv4Candidate);
+            }
         }
 
-        public async Task<RTCPeerConnection> GotOffer(RTCSessionDescriptionInit offer)
+        SDP offerSDP = SDP.ParseSDPDescription(offer.sdp);
+
+        if (offerSDP.Media.Any(x => x.Media == SDPMediaTypesEnum.audio))
         {
-            logger.LogDebug($"SDP offer received.");
-            logger.LogDebug(offer.sdp);
+            MediaStreamTrack audioTrack = new MediaStreamTrack(SDPWellKnownMediaFormatsEnum.PCMU);
+            pc.addTrack(audioTrack);
+        }
 
-            var pc = new RTCPeerConnection();
+        if (offerSDP.Media.Any(x => x.Media == SDPMediaTypesEnum.video))
+        {
+            MediaStreamTrack videoTrack = new MediaStreamTrack(new VideoFormat(VideoCodecsEnum.VP8, VP8_PAYLOAD_ID));
+            pc.addTrack(videoTrack);
+        }
 
-            if (_presetIceAddresses != null)
+        pc.OnRtpPacketReceived += (IPEndPoint rep, SDPMediaTypesEnum media, RTPPacket rtpPkt) =>
+        {
+            pc.SendRtpRaw(media, rtpPkt.Payload, rtpPkt.Header.Timestamp, rtpPkt.Header.MarkerBit, rtpPkt.Header.PayloadType);
+        };
+
+        pc.OnTimeout += (mediaType) => logger.LogWarning($"Timeout for {mediaType}.");
+        pc.oniceconnectionstatechange += (state) => logger.LogInformation($"ICE connection state changed to {state}.");
+        pc.onsignalingstatechange += () => logger.LogInformation($"Signaling state changed to {pc.signalingState}.");
+        pc.onconnectionstatechange += (state) =>
+        {
+            logger.LogInformation($"Peer connection state changed to {state}.");
+            if (state == RTCPeerConnectionState.failed)
             {
-                foreach (var addr in _presetIceAddresses)
-                {
-                    var rtpPort = pc.GetRtpChannel().RTPPort;
-                    var publicIPv4Candidate = new RTCIceCandidate(RTCIceProtocol.udp, addr, (ushort)rtpPort, RTCIceCandidateType.host);
-                    pc.addLocalIceCandidate(publicIPv4Candidate);
-                }
+                pc.Close("ice failure");
             }
+        };
 
-            SDP offerSDP = SDP.ParseSDPDescription(offer.sdp);
-
-            if (offerSDP.Media.Any(x => x.Media == SDPMediaTypesEnum.audio))
+        pc.ondatachannel += (dc) =>
+        {
+            logger.LogInformation($"Data channel opened for label {dc.label}, stream ID {dc.id}.");
+            dc.onmessage += (rdc, proto, data) =>
             {
-                MediaStreamTrack audioTrack = new MediaStreamTrack(SDPWellKnownMediaFormatsEnum.PCMU);
-                pc.addTrack(audioTrack);
-            }
-
-            if (offerSDP.Media.Any(x => x.Media == SDPMediaTypesEnum.video))
-            {
-                MediaStreamTrack videoTrack = new MediaStreamTrack(new VideoFormat(VideoCodecsEnum.VP8, VP8_PAYLOAD_ID));
-                pc.addTrack(videoTrack);
-            }
-
-            pc.OnRtpPacketReceived += (IPEndPoint rep, SDPMediaTypesEnum media, RTPPacket rtpPkt) =>
-            {
-                pc.SendRtpRaw(media, rtpPkt.Payload, rtpPkt.Header.Timestamp, rtpPkt.Header.MarkerBit, rtpPkt.Header.PayloadType);
+                logger.LogInformation($"Data channel got message: {Encoding.UTF8.GetString(data)}");
+                rdc.send(Encoding.UTF8.GetString(data));
             };
+        };
 
-            pc.OnTimeout += (mediaType) => logger.LogWarning($"Timeout for {mediaType}.");
-            pc.oniceconnectionstatechange += (state) => logger.LogInformation($"ICE connection state changed to {state}.");
-            pc.onsignalingstatechange += () => logger.LogInformation($"Signaling state changed to {pc.signalingState}.");
-            pc.onconnectionstatechange += (state) =>
-            {
-                logger.LogInformation($"Peer connection state changed to {state}.");
-                if (state == RTCPeerConnectionState.failed)
-                {
-                    pc.Close("ice failure");
-                }
-            };
+        var setResult = pc.setRemoteDescription(offer);
+        if (setResult == SetDescriptionResultEnum.OK)
+        {
+            var answer = pc.createAnswer();
+            await pc.setLocalDescription(answer);
 
-            pc.ondatachannel += (dc) =>
-            {
-                logger.LogInformation($"Data channel opened for label {dc.label}, stream ID {dc.id}.");
-                dc.onmessage += (rdc, proto, data) =>
-                {
-                    logger.LogInformation($"Data channel got message: {Encoding.UTF8.GetString(data)}");
-                    rdc.send(Encoding.UTF8.GetString(data));
-                };
-            };
+            logger.LogDebug($"SDP answer created.");
+            logger.LogDebug(answer.sdp);
 
-            var setResult = pc.setRemoteDescription(offer);
-            if (setResult == SetDescriptionResultEnum.OK)
-            {
-                var answer = pc.createAnswer();
-                await pc.setLocalDescription(answer);
-
-                logger.LogDebug($"SDP answer created.");
-                logger.LogDebug(answer.sdp);
-
-                return pc;
-            }
-            else
-            {
-                logger.LogWarning($"Failed to set remote description {setResult}.");
-                return null;
-            }
+            return pc;
+        }
+        else
+        {
+            logger.LogWarning($"Failed to set remote description {setResult}.");
+            return null;
         }
     }
 }
