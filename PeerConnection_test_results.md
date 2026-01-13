@@ -1,4 +1,4 @@
-Test run at 2026-01-11 06:15:18.195795
+Test run at 2026-01-13 20:30:03.389329
 
 | Server       | aiortc | libdatachannel | pion | sipsorcery | webrtc-rs | werift |
 |--------|--------|--------|--------|--------|--------|--------|
