@@ -85,9 +85,12 @@ docker run -it --rm --init -p 8080:8080 ghcr.io/sipsorcery/werift-webrtc-echo
 - Servers can also be tested with docker images:
 
 ````
+docker run --entrypoint "/client.sh" ghcr.io/sipsorcery/aiortc-webrtc-echo http://host.docker.internal:8080/offer
+docker run --entrypoint "/client.sh" ghcr.io/sipsorcery/libdatachannel-webrtc-echo http://host.docker.internal:8080/offer
 docker run --entrypoint "/client.sh" ghcr.io/sipsorcery/pion-webrtc-echo http://host.docker.internal:8080/offer
 docker run --entrypoint "/client.sh" ghcr.io/sipsorcery/sipsorcery-webrtc-echo http://host.docker.internal:8080/offer
-etc...
+docker run --entrypoint "/client.sh" ghcr.io/sipsorcery/webrtc-rs-webrtc-echo http://host.docker.internal:8080/offer
+docker run --entrypoint "/client.sh" ghcr.io/sipsorcery/werift-webrtc-echo http://host.docker.internal:8080/offer
 ````
 
 - Create a [Dockerfile](doc/EchoTestDockerRequirements.md) and add a Pull Request for it so your Peer Connection Test application(s) can be included in the automated testing.
