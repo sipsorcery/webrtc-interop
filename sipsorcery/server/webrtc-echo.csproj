@@ -11,7 +11,7 @@
     <PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
     <PackageReference Include="EmbedIO" Version="3.5.2" />
-    <PackageReference Include="SIPSorcery" Version="10.0.3" />
+    <PackageReference Include="SIPSorcery" Version="10.0.4-pre" />
   </ItemGroup>
 
   <ItemGroup>
