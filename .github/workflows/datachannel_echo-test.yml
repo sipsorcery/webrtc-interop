@@ -33,17 +33,24 @@ jobs:
       result_libdatachannel_libdatachannel: ${{ steps.set-output.outputs.result_libdatachannel_libdatachannel }}
       result_libdatachannel_sipsorcery: ${{ steps.set-output.outputs.result_libdatachannel_sipsorcery }}
       result_libdatachannel_werift: ${{ steps.set-output.outputs.result_libdatachannel_werift }}
+      result_libdatachannel_webrtc-server: ${{ steps.set-output.outputs.result_libdatachannel_webrtc-server }}
       result_sipsorcery_libdatachannel: ${{ steps.set-output.outputs.result_sipsorcery_libdatachannel }}
       result_sipsorcery_sipsorcery: ${{ steps.set-output.outputs.result_sipsorcery_sipsorcery }}
       result_sipsorcery_werift: ${{ steps.set-output.outputs.result_sipsorcery_werift }}
+      result_sipsorcery_webrtc-server: ${{ steps.set-output.outputs.result_sipsorcery_webrtc-server }}
       result_werift_libdatachannel: ${{ steps.set-output.outputs.result_werift_libdatachannel }}
       result_werift_sipsorcery: ${{ steps.set-output.outputs.result_werift_sipsorcery }}
       result_werift_werift: ${{ steps.set-output.outputs.result_werift_werift }}
+      result_werift_webrtc-server: ${{ steps.set-output.outputs.result_werift_webrtc-server }}
+      result_webrtc-server_libdatachannel: ${{ steps.set-output.outputs.result_webrtc-server_libdatachannel }}
+      result_webrtc-server_sipsorcery: ${{ steps.set-output.outputs.result_webrtc-server_sipsorcery }}
+      result_webrtc-server_werift: ${{ steps.set-output.outputs.result_webrtc-server_werift }}
+      result_webrtc-server_webrtc-server: ${{ steps.set-output.outputs.result_webrtc-server_webrtc-server }}
 
     strategy:
       matrix:
-        server: ["libdatachannel", "sipsorcery", "werift"]
-        client: ["libdatachannel", "sipsorcery", "werift"]
+        server: ["libdatachannel", "sipsorcery", "werift", "webrtc-server"]
+        client: ["libdatachannel", "sipsorcery", "werift", "webrtc-server"]
 
     steps:
                
