@@ -14,25 +14,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Fork PRs do not receive CR_PAT. Validate Dockerfiles without pulling private GHCR images.
-  pr-docker-build:
-    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        library: ["libdatachannel", "sipsorcery", "werift", "webrtc-server"]
-    steps:
-      - uses: actions/checkout@v2
-      - name: Update submodules
-        if: matrix.library == 'libdatachannel'
-        run: git submodule update --init --recursive
-      - name: Build ${{ matrix.library }} docker image
-        run: docker build -t ${{ matrix.library }}-webrtc-echo -f ${{ matrix.library }}/Dockerfile .
-
   # Job Description: Performs the Data Channel Test between each combination of the client and server for each library.
-  # Full matrix pulls private GHCR images with CR_PAT; skip on fork PRs where secrets are unavailable.
   interoptests:
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
 
     services:
@@ -87,7 +70,6 @@ jobs:
          
   # Job Description: Collates the results of the interop tests into a mark down table.
   collate:
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     needs: [interoptests]
     steps:
