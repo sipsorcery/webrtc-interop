@@ -18,6 +18,7 @@ The libraries that currently have a Client and Server implementation are:
  - [webrtc-rs](https://github.com/webrtc-rs/webrtc): A pure Rust implementation of WebRTC stack. Rewrite [Pion](https://github.com/pion/webrtc) WebRTC stack in Rust.
  - [SIPSorcery](https://github.com/sipsorcery-org/sipsorcery): A WebRTC, SIP and VoIP library for C# and .NET. Designed for real-time communications apps.
  - [werift-webrtc](https://github.com/shinyoshiaki/werift-webrtc): WebRTC Implementation for TypeScript (Node.js)
+ - [webrtc-server](https://github.com/colocohen/webrtc-server): Pure JavaScript implementation of the WebRTC API for Node.js with a browser compatible interface.
 
 Additional libraries/applications that currently have a Server implementation are:
 
@@ -35,7 +36,7 @@ The current interoperability tests are:
  - **[Data Channel Echo Test](doc/DataChannelEchoTestSpecification.md)**: This test builds on the [Peer Connection Test](doc/PeerConnectionTestSpecification.md) and adds a `data channel` test. It tests the ability of the peers to create a data channel and then checks that the `Server Peer` can echo a string message sent by the `Client Peer`.
 
 ## Peer Connection Test Results
-Test run at 2026-08-05 12:25:32.803284
+Test run at 2026-05-23 12:19:46.330154
 
 | Server       | aiortc | libdatachannel | pion | sipsorcery | webrtc-rs | werift |
 |--------|--------|--------|--------|--------|--------|--------|
@@ -48,9 +49,9 @@ Test run at 2026-08-05 12:25:32.803284
 | pion         | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) |
 | sipsorcery   | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) |
 | webrtc-rs    | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) |
-| werift       | ![https://img.shields.io/badge/-✘-red](https://img.shields.io/badge/-✘-red) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) |
+| werift       | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) |
 ## Data Channel Echo Test Results
-Test run at 2026-08-05 12:19:37.335028
+Test run at 2026-05-23 12:13:51.965743
 
 | Server       | libdatachannel | sipsorcery | werift |
 |--------|--------|--------|--------|
@@ -76,6 +77,7 @@ docker run -it --rm --init -p 8080:8080 ghcr.io/sipsorcery/pion-webrtc-echo
 docker run -it --rm --init -p 8080:8080 ghcr.io/sipsorcery/sipsorcery-webrtc-echo
 docker run -it --rm --init -p 8080:8080 ghcr.io/sipsorcery/webrtc-rs-webrtc-echo
 docker run -it --rm --init -p 8080:8080 ghcr.io/sipsorcery/werift-webrtc-echo
+docker run -it --rm --init -p 8080:8080 ghcr.io/sipsorcery/webrtc-server-webrtc-echo
 ````
 
 - If you encounter any problems open an [Issue](https://github.com/sipsorcery/webrtc-echoes/issues). When done submit a [Pull Request](https://github.com/sipsorcery/webrtc-echoes/pulls) for your application.
@@ -91,6 +93,7 @@ docker run --entrypoint "/client.sh" ghcr.io/sipsorcery/pion-webrtc-echo http://
 docker run --entrypoint "/client.sh" ghcr.io/sipsorcery/sipsorcery-webrtc-echo http://host.docker.internal:8080/offer
 docker run --entrypoint "/client.sh" ghcr.io/sipsorcery/webrtc-rs-webrtc-echo http://host.docker.internal:8080/offer
 docker run --entrypoint "/client.sh" ghcr.io/sipsorcery/werift-webrtc-echo http://host.docker.internal:8080/offer
+docker run --entrypoint "/client.sh" ghcr.io/sipsorcery/webrtc-server-webrtc-echo http://host.docker.internal:8080/offer
 ````
 
 - Create a [Dockerfile](doc/EchoTestDockerRequirements.md) and add a Pull Request for it so your Peer Connection Test application(s) can be included in the automated testing.

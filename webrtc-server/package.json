@@ -1,0 +1,17 @@
+{
+  "name": "webrtc-server-echo",
+  "version": "1.0.0",
+  "description": "webrtc-server interop test peer for sipsorcery/webrtc-interop",
+  "private": true,
+  "license": "MIT",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "client": "node client.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "webrtc-server": "latest"
+  }
+}
