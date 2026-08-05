@@ -1,2 +1,3 @@
 #!/bin/bash
-DEBUG=werift* node -r ts-node/register client.ts $1 -t 1
+# Run the compiled client for the Data Channel Echo test.
+DEBUG=werift* node client.js $1 -t 1
