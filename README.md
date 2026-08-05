@@ -52,13 +52,14 @@ Test run at 2026-08-05 15:28:14.946445
 | webrtc-server | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) |
 | werift       | ![https://img.shields.io/badge/-✘-red](https://img.shields.io/badge/-✘-red) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) |
 ## Data Channel Echo Test Results
-Test run at 2026-05-23 12:13:51.965743
+Test run at 2026-08-05 21:59:05.580863
 
-| Server       | libdatachannel | sipsorcery | werift |
-|--------|--------|--------|--------|
-| libdatachannel | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) |
-| sipsorcery   | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) |
-| werift       | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) |
+| Server       | libdatachannel | sipsorcery | webrtc-server | werift |
+|--------|--------|--------|--------|--------|
+| libdatachannel | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) |
+| sipsorcery   | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) |
+| webrtc-server | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) |
+| werift       | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) |
 ## Get Started
 
 If you are interested in adding a library to this project the recommended steps are listed below. The steps don't necessarily have to be completed in any specific order.
