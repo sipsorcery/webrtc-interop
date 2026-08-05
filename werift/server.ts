@@ -49,7 +49,7 @@ app.post("/offer", async (req, res) => {
     pc.addTrack(track);
   });
   pc.onDataChannel.subscribe((dc) => {
-    dc.message.subscribe((msg) => {
+    dc.onMessage.subscribe((msg) => {
       console.log("datachannel incoming message", msg);
       dc.send(msg);
     });

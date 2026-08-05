@@ -6,7 +6,7 @@ A Node Typescript application that runs a WebRTC Echo Server.
 
 **Prerequisites**
 
-- Node.js version 14+
+- Node.js version 16+
 - yarn (or npm)
 - `yarn install` (or `npm install`)
 
@@ -28,7 +28,7 @@ A Node Typescript application that acts as a peer for a WebRTC Echo Server.
 
 - ffmpeg
 - GStreamer
-- Node.js version 14+
+- Node.js version 16+
 - yarn (or npm)
 - `yarn install` (or `npm install`)
 

@@ -54,7 +54,7 @@ new Promise<void>(async (done, failed) => {
     dc.onopen = () => {
       dc.send(pseudo);
     };
-    dc.message.subscribe((msg) => {
+    dc.onMessage.subscribe((msg) => {
       console.log("data channel onmessage");
       if (msg === pseudo) {
         console.log("Data channel echo test success.");
@@ -66,10 +66,14 @@ new Promise<void>(async (done, failed) => {
   }
 
   await pc.setLocalDescription(await pc.createOffer());
-  console.log("local offer ", pc.localDescription?.sdp);
+  const localDescription = pc.localDescription;
+  if (!localDescription) {
+    throw new Error("Failed to create local description");
+  }
+  console.log("local offer ", localDescription.sdp);
   const data = await got
     .post(url, {
-      json: pc.localDescription,
+      json: localDescription,
       retry: { limit: 5, methods: ["POST"] },
     })
     .json<any>()
