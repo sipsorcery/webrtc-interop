@@ -52,7 +52,7 @@ Test run at 2026-08-05 22:48:28.809127
 | webrtc-server | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) |
 | werift       | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) | ![https://img.shields.io/badge/-✔-green](https://img.shields.io/badge/-✔-green) |
 ## Data Channel Echo Test Results
-Test run at 2026-08-05 22:43:14.382679
+Test run at 2026-08-18 20:33:36.463827
 
 | Server       | libdatachannel | sipsorcery | webrtc-server | werift |
 |--------|--------|--------|--------|--------|

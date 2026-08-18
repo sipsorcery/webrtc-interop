@@ -1,4 +1,4 @@
-Test run at 2026-08-05 22:43:14.382679
+Test run at 2026-08-18 20:33:36.463827
 
 | Server       | libdatachannel | sipsorcery | webrtc-server | werift |
 |--------|--------|--------|--------|--------|
